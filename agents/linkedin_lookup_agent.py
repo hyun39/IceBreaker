@@ -42,5 +42,5 @@ def lookup(name: str) -> str:
         input={"input": prompt_template.format_prompt(name_of_person=name)}
     )
 
-    linked_profile_url = result["output"]
-    return linked_profile_url
+    linkedin_url = result["output"]
+    return linkedin_url
