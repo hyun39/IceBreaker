@@ -8,7 +8,6 @@ Ice Breaker is a Flask-based web application that generates personalized convers
 
 ## Development Commands
 
-### Running the Application
 ```bash
 # Install dependencies
 pipenv install
@@ -16,74 +15,33 @@ pipenv install
 # Run the Flask application
 pipenv run python app.py
 
-# Or directly with pipenv shell
-pipenv shell
-python app.py
-```
-
-### Code Quality Tools
-```bash
-# Format code with Black
+# Format and lint
 pipenv run black .
-
-# Sort imports with isort
 pipenv run isort .
-
-# Lint code with pylint
 pipenv run pylint [module_name]
 ```
 
-### Testing
-```bash
-# Note: No test files currently exist, but the README mentions pytest
-pipenv run pytest .
-```
+## Architecture
 
-## Architecture & Key Components
+Request flow: `app.py` (`POST /process`) → `ice_breaker.ice_break_with()` → agents discover profile URLs → third-party scrapers fetch data → three LangChain chains process it → structured Pydantic response.
 
-### Core Pipeline Flow
-1. **Web Interface** (`app.py`): Flask server handling UI and API endpoints
-2. **Main Logic** (`ice_breaker.py`): Orchestrates the entire ice breaker generation pipeline
-3. **Agent System**: Profile lookup agents for LinkedIn and Twitter discovery
-4. **Data Extraction**: Third-party integrations for scraping social media data
-5. **AI Processing**: LangChain chains for generating summaries, interests, and ice breakers
-6. **Output Parsing**: Structured response formatting using Pydantic models
+**Agents** (`agents/`): ReAct agents using `gpt-4o-mini` that call Tavily search to find a person's LinkedIn and Twitter URLs from their name. Pulls the ReAct prompt from LangChain Hub (`hwchase17/react`).
 
-### Key Modules
+**Chains** (`chains/custom_chains.py`): Three `PromptTemplate | ChatOpenAI | PydanticOutputParser` sequences using `gpt-3.5-turbo`. Summary and interests chains use `temperature=0`; ice breaker chain uses `temperature=1`.
 
-- **agents/**: LangChain ReAct agents for profile discovery
-  - Uses Tavily for web search to find LinkedIn/Twitter profiles
-  - Leverages LangChain hub prompts (hwchase17/react)
+**Output parsers** (`output_parsers.py`): `Summary`, `TopicOfInterest`, and `IceBreaker` Pydantic models, each with a `to_dict()` method used by the Flask JSON response.
 
-- **chains/**: Custom LangChain sequences for AI processing
-  - Three distinct chains: summary, interests, ice breakers
-  - Uses GPT-3.5-turbo with different temperature settings
+**Third parties**:
+- `linkedin.py`: calls Scrapin.io API. Has a `mock=True` flag that fetches a static GitHub Gist instead — useful for local dev without an API key.
+- `twitter.py`: `scrape_user_tweets_mock()` fetches a static GitHub Gist. **`ice_breaker.py` always calls the mock**, never the real Twitter function. Note: `twitter.py` instantiates a `tweepy.Client` at module import time, so all five Twitter env vars must be present even when using the mock.
 
-- **third_parties/**: External API integrations
-  - LinkedIn scraping via Scrapin.io API
-  - Twitter data via Twitter API (with mock fallback)
+## Environment Variables
 
-- **tools/**: Utility functions for web search using Tavily
-
-- **output_parsers.py**: Pydantic models for structured outputs (Summary, TopicOfInterest, IceBreaker)
-
-## API Dependencies
-
-Required environment variables in `.env`:
-- `OPENAI_API_KEY` - OpenAI API for LLM
-- `SCRAPIN_API_KEY` - Scrapin.io for LinkedIn data
-- `TAVILY_API_KEY` - Tavily for web search
-- `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_TOKEN`, `TWITTER_ACCESS_SECRET` - Optional Twitter API
+Required in `.env` (see `.env.example`):
+- `OPENAI_API_KEY`
+- `SCRAPIN_API_KEY` — Scrapin.io for LinkedIn data
+- `TAVILY_API_KEY` — Tavily web search for agents
+- `TWITTER_BEARER_TOKEN`, `TWITTER_API_KEY`, `TWITTER_API_KEY_SECRET`, `TWITTER_ACCESS_TOKEN`, `TWITTER_ACCESS_TOKEN_SECRET` — required at import time even when using the mock
 
 Optional LangSmith tracing:
-- `LANGCHAIN_TRACING_V2=true`
-- `LANGCHAIN_API_KEY`
-- `LANGCHAIN_PROJECT=ice_breaker`
-
-## Development Notes
-
-- The application uses GPT-4o-mini for agents and GPT-3.5-turbo for chains
-- Twitter integration has a mock implementation (`scrape_user_tweets_mock`) for testing
-- Flask runs in debug mode by default on host 0.0.0.0
-- LangChain agents use verbose mode for debugging
-- No unit tests are currently implemented despite pytest being mentioned
+- `LANGCHAIN_TRACING_V2=true`, `LANGCHAIN_API_KEY`, `LANGCHAIN_PROJECT=ice_breaker`
