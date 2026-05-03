@@ -1,3 +1,7 @@
+---
+description: Orchestrate infinite parallel generation tasks with sub-agents. Usage: <spec_file> <output_dir> <count>
+---
+
 **INFINITE AGENTIC LOOP COMMAND**
 
 Think deeply about this infinite generation task. You are about to embark on a sophisticated iterative creation process.

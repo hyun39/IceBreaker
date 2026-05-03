@@ -132,3 +132,60 @@ Claude Code 세션 (메인)
 
 오케스트레이터(메인 세션)의 컨텍스트는 Sub Agent들의 결과를 계속 받으면서 쌓이기 때문에,  
 `infinite` 모드에서는 컨텍스트 한계에 도달하면 자연스럽게 종료된다.
+
+---
+
+## 실행 방법
+
+### 사전 준비
+
+1. `.claude/commands/` 에 `infinite.md`, `prime.md` 복사 (이미 완료)
+2. `specs/` 폴더에 스펙 파일 복사 (이미 완료)
+3. Claude Code 실행
+```bash
+claude
+```
+
+### Step 1: prime으로 컨텍스트 준비 (선택)
+
+```
+/project:prime
+```
+에이전트 루프 실행 전 컨텍스트를 준비한다. 생략 가능하지만 권장.
+
+### Step 2: infinite 실행
+
+**단일 생성 (테스트용):**
+```
+/project:infinite specs/invent_new_ui_v3.md src 1
+```
+
+**소규모 배치 (5개 동시):**
+```
+/project:infinite specs/invent_new_ui_v3.md src 5
+```
+
+**대규모 배치 (20개):**
+```
+/project:infinite specs/invent_new_ui_v3.md src 20
+```
+
+**무한 모드 (컨텍스트 한계까지 연속 생성):**
+```
+/project:infinite specs/invent_new_ui_v3.md src infinite
+```
+
+### 스펙 파일 선택 가이드
+
+| 스펙 파일 | 출력 형태 | 추천 상황 |
+|-----------|-----------|-----------|
+| `invent_new_ui.md` | 단일 HTML | 혁신적인 UI 실험 |
+| `invent_new_ui_v2.md` | 단일 HTML | 기존 컴포넌트 개선 |
+| `invent_new_ui_v3.md` | 단일 HTML | 테마형 하이브리드 컴포넌트 |
+| `invent_new_ui_v4.md` | HTML + CSS + JS 분리 | 모듈화된 구조가 필요할 때 |
+
+### 주의사항
+
+- 같은 output 폴더에 명령을 **동시에 두 번** 실행하면 파일 번호 충돌 가능
+- 순차 실행은 안전 (PHASE 2에서 기존 번호를 스캔하여 이어서 생성)
+- `infinite` 모드는 컨텍스트 소진 시 자동 종료됨

@@ -1,3 +1,7 @@
+---
+description: Prime the context window before running the infinite agentic loop
+---
+
 # Context Window Prime
 
 RUN:
