@@ -53,7 +53,8 @@ specs/edit/
     │
     │   # --- 3순위: 팀·프로세스 성숙도 ---
     ├── adr_format.md                      # Architecture Decision Record 템플릿 및 예시
-    └── data_governance.md                 # 데이터 분류 / PII 마스킹 / 계보 / 마이그레이션
+    ├── data_governance.md                 # 데이터 분류 / PII 마스킹 / 계보 / 마이그레이션
+    └── data_pipeline_airflow.md           # 수집→ODS→DW→MART Airflow 파이프라인 기술 기준
 ```
 
 ---
@@ -88,6 +89,7 @@ specs/edit/
 | `common/messaging.md` | 백엔드 | Kafka 이벤트 설계·DLQ·Outbox 패턴은? |
 | `common/adr_format.md` | 전체 팀 | 아키텍처 결정을 어떻게 기록하는가? |
 | `common/data_governance.md` | 백엔드·DBA·보안 | 데이터 분류·PII 처리·보존 기간 기준은? |
+| `common/data_pipeline_airflow.md` | 데이터 엔지니어 | 수집→ODS→DW→MART 파이프라인을 어떻게 구성하는가? |
 
 ---
 

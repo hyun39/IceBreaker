@@ -1,0 +1,67 @@
+SA,영역,주요질문,답변
+SA,보안,OWASP 관점에서 애플리케이션 레이어에서 최소로 해야 할 일은?,입력 검증(ORM 바인딩·스키마 검증)·출력 인코딩·접근 제어(RBAC)·민감 데이터 암호화·보안 헤더·로그 내 PII 마스킹 등 스펙의 레이어드 방어와 Top 10 매핑을 따른다.
+SA,보안,TLS와 인증서는 어떻게 운영하는가?,가능하면 TLS 1.3·강한 암호 스위트이며 K8s에서는 cert-manager 등으로 인증서를 자동 발급·갱신하고 인그레스에 적용한다.
+SA,보안,의존성과 이미지 무결성은?,Dependabot·Trivy·pip audit 등으로 취약 컴포넌트를 주기 스캔하고 이미지 서명·SBOM으로 공급망 무결성을 보강한다.
+SA,테스트 전략,테스트 피라미드 비율과 실패 시 정책은?,단위 다수·통합 중간·E2E 소수를 기본으로 하고 실패 시 PR 머지 또는 배포 차단 등 스펙 표의 게이트에 맞춘다.
+SA,테스트 전략,단위 테스트 작성 원칙은?,FIRST·AAA·외부(DB·API·LLM) 격리·한 테스트 한 동작을 지킨다.
+SA,테스트 전략,E2E는 언제 돌리는가?,비용이 크므로 main 머지 후 또는 배포 전 등 스펙에 둔 시점에 실행하고 실패 시 배포를 막을 수 있다.
+SA,ADR,ADR에 꼭 들어가야 하는 내용은?,배경·검토한 옵션·내린 결정·결과(파급)·상태(제안/수락/폐기/대체)와 날짜·결정자다.
+SA,ADR,결정이 바뀌면 ADR은 어떻게 하나?,수락된 ADR 본문을 고치지 않고 새 ADR로 대체 관계를 명시해 이력을 보존한다.
+SA,ADR,ADR 파일은 어디에 두나?,저장소의 `docs/adr/` 등 합의된 경로에 `ADR-번호-제목.md` 형식으로 둔다.
+SA,인프라·CI/CD,CI 파이프라인의 일반적 순서는?,lint → test → build → 컨테이너 이미지 푸시 등으로 정하고 CD는 환경별 승인과 연동한다.
+SA,인프라·CI/CD,Docker 이미지 보안 기본은?,멀티스테이지 빌드·런타임 non-root 사용자·최소 베이스 이미지를 권장한다.
+SA,인프라·CI/CD,K8s 배포 시 환경 분리는?,dev/staging/prod 네임스페이스 등으로 나누고 RollingUpdate 등 무중단 전략을 문서화한다.
+SA,데이터 거버넌스,데이터 민감도는 어떻게 나누나?,L1 공개부터 L4 PII까지 등급을 정하고 처리·보존·접근을 등급별로 다르게 한다.
+SA,데이터 거버넌스,PII가 로그에 남지 않게 하려면?,필드·패턴 마스킹과 수집 단계 redaction을 적용하고 로그 보존은 ILM 등으로 제한한다.
+SA,데이터 거버넌스,보존 기간이 지난 데이터는?,배치 삭제·아카이빙 정책을 SQL/운영 절차로 명시한다.
+SA,API Gateway,게이트웨이의 역할은?,TLS 종료·토큰 검증·Rate limiting·라우팅·LB·요청 변환·서킷 브레이커 등 단일 진입점 책임이다.
+SA,API Gateway,게이트웨이 제품은 어떻게 고르나?,Kong·nginx·AWS API Gateway·Traefik 등을 배포 형태·K8s 연동·OIDC·학습 비용으로 비교해 선택한다.
+SA,API Gateway,라우팅 우선순위는 어떻게 정하나?,헬스·인증·관리·버전 API 순 등 스펙의 우선순위 표를 따르고 인증 예외 경로를 명시한다.
+SA,Database,언제 비정규화해도 되나?,외부 API 스키마 유동성·집계 성능 등 명확한 이유가 있을 때이며 주석으로 이유를 남긴다.
+SA,Database,PK 설계 권장은?,내부 조인용 BIGSERIAL과 외부 노출용 UUID 병행 등 스펙 표의 장단에 맞게 선택한다.
+SA,Database,FK 삭제 정책은?,CASCADE·RESTRICT·SET NULL 등 데이터 의미에 맞게 고르고 논리 FK는 주석으로 문서화한다.
+SA,Versions,버전 정보는 어디서 보나?,`versions.md`가 common 스펙의 단일 카탈로그이며 각 세부 스펙의 출처와 맞춘다.
+SA,Versions,아직 버전이 정해지지 않았으면?,TBD로 두고 최소 버전은 `+`로 표기하는 규칙을 따른다.
+SA,Versions,AI 스택 버전은 왜 따로 있나?,LangChain·임베딩·벡터 DB는 런타임·비용·호환에 민감해 별도 표로 관리한다.
+SA,관측성,Trace와 Span의 관계는?,하나의 요청 Trace 아래에 DB·HTTP 등 작업 단위 Span이 트리로 달린다.
+SA,관측성,OTel Collector의 역할은?,앱의 OTLP를 받아 traces·metrics·logs를 Jaeger·Prometheus·OpenSearch 등으로 라우팅한다.
+SA,관측성,FastAPI 계측 시 무엇을 켜나?,FastAPI·httpx 등 자동 계측과 서비스 리소스 속성·배치 익스포터를 설정한다.
+SA,Backend FastAPI,계층 구조는?,Router(검증)·Service(비즈니스)·Repository/Client(DB·외부)로 나누고 계층 건너뛰기를 금지한다.
+SA,Backend FastAPI,설정 관리는?,pydantic-settings로 환경 변수를 모델화하고 시크릿을 코드에 넣지 않는다.
+SA,Backend FastAPI,비동기 외부 호출은?,httpx AsyncClient 등으로 타임아웃·재시도 정책을 명시한다.
+SA,Backend Spring Boot,검증과 예외는?,Bean Validation과 전역 예외 핸들러로 API 오류 형식을 통일한다.
+SA,Backend Spring Boot,HTTP 클라이언트는?,RestClient/WebClient 등 버전에 맞는 클라이언트와 타임아웃을 설정한다.
+SA,Backend Spring Boot,Java 버전은?,스펙 기준 Java 21 LTS와 Spring Boot 3.x 조합을 전제로 한다.
+SA,비즈니스 스펙,무엇을 쓰지 말아야 하나?,구현 방법·프레임워크·API 상세 같은 기술 설계는 배제하고 무엇·왜 중심으로 쓴다.
+SA,비즈니스 스펙,필수 섹션은?,문서 정보·배경·가치·이해관계자·시나리오·기능/비기능 요건 등 템플릿 섹션을 채운다.
+SA,비즈니스 스펙,Gherkin과 어떻게 연결하나?,인수기준을 시나리오와 맞추고 feature 파일에서 스펙 ID를 참조할 수 있다.
+SA,RAG,오프라인과 온라인 단계는?,오프라인에서 청킹·임베딩·저장하고 온라인에서 검색·컨텍스트 구성·생성한다.
+SA,RAG,임베딩·스토어는 어떻게 고르나?,다국어·비용·차원·온프레미스 여부에 따라 small/large·bge-m3·pgvector 등 후보를 비교한다.
+SA,RAG,검색 품질을 올리려면?,하이브리드 검색·MMR·크로스 인코더 리랭킹 등 스펙의 고급 패턴을 검토한다.
+SA,메시징·EDA,언제 메시징을 도입하나?,장시간 LLM·외부 장애·버퍼링·느슨한 결합이 필요할 때 동기 HTTP 대신 큐·이벤트를 쓴다.
+SA,메시징·EDA,이벤트 페이로드 규칙은?,event_id·type·version·timestamp·source·correlation_id·payload 등 공통 필드를 유지한다.
+SA,메시징·EDA,Kafka와 RabbitMQ 선택 기준은?,처리량·보존·재처리·운영 성숙도를 표에 맞춰 고른다.
+SA,캐싱,레이어 순서는?,브라우저→CDN→게이트웨이→Redis→DB 순으로 히트를 시도하는 구조를 이해하고 설계한다.
+SA,캐싱,키 이름은 어떻게 짓나?,서비스·버전·엔티티·식별자 등 컨벤션을 정해 충돌과 무효화 범위를 통제한다.
+SA,캐싱,Cache-Aside가 권장되는 이유는?,앱이 캐시 미스 시 DB를 읽어 채우는 패턴이 단순하고 운영에 유연하다.
+SA,Agent,무한 루프를 막으려면?,max_iterations·max_execution_time·early_stopping 등 AgentExecutor 설정을 제한한다.
+SA,Agent,툴은 어떻게 설계하나?,단일 책임·명확한 description·결정론적 출력·예외 대신 오류 문자열 반환을 지킨다.
+SA,Agent,ReAct 외 패턴은?,CoT·Plan-and-Execute·Multi-Agent 등 과제 복잡도에 맞게 선택한다.
+SA,Frontend,렌더링 전략은 어떻게 고르나?,CSR·SSR·SSG·하이브리드·서버 템플릿을 SEO·초기 로딩·인터랙션 요구에 맞춰 선택한다.
+SA,Frontend,상태 관리는?,컴포넌트 로컬부터 Zustand·Redux까지 규모에 맞게 선택하고 API 레이어는 분리한다.
+SA,Frontend,요청 취소는?,AbortController 등으로 언마운트·연속 입력 시 이전 요청을 끊는다.
+SA,인증·Keycloak,브라우저 앱에 권장되는 플로우는?,Authorization Code + PKCE로 브라우저에 client secret을 두지 않는다.
+SA,인증·Keycloak,백엔드는 토큰을 어떻게 검증하나?,JWKS로 서명 검증하고 issuer·audience·만료를 확인하며 역할 클레임을 정책과 맞춘다.
+SA,인증·Keycloak,M2M은?,Client Credentials 등 특수 플로우를 별도로 정의한다.
+SA,브랜치 전략,일상 기능 개발은 어디서 하나?,develop에서 분기한 feature/fix 브랜치로 작업하고 PR로 머지한다.
+SA,브랜치 전략,프로덕션 반영 선은?,main이 프로덕션 후보이며 릴리스·태그 기준을 명시한다.
+SA,브랜치 전략,핫픽스는?,main에서 hotfix를 만들고 main과 develop(또는 release)에 동일 패치를 반영한다.
+SA,배포 전략,테스트와 배포를 어떻게 연결하나?,PR 단계 Lint/Unit·머지 전 Integration·배포 전 E2E 등 스펙·시퀀스 다이어그램 기준을 따른다.
+SA,배포 전략,환경 승급은?,dev 자동·staging/prod 수동 승인 등 프로모션 정책을 infra 스펙과 일치시킨다.
+SA,배포 전략,롤백은?,이전 이미지 태그·Helm revision 등 정의된 롤백 절차를 둔다.
+SA,데이터 파이프라인 Airflow,레이어 이름과 역할은?,Raw 불변·ODS 정규화·DW 스타 스키마·MART 소비자용 요약으로 역할을 나눈다.
+SA,데이터 파이프라인 Airflow,Executor는?,운영 K8s에서는 KubernetesExecutor를 권장하고 로컬은 제한적으로 LocalExecutor 등을 쓴다.
+SA,데이터 파이프라인 Airflow,dbt 역할은?,ODS→DW→MART SQL 변환을 dbt가 담당하고 Airflow가 오케스트레이션한다.
+SA,데이터 파이프라인 ODS/DW/Mart,DAG 설계 시 고려할 것은?,idempotent·재실행·백필·SLA·실패 알림·데이터 품질 검증을 포함한다.
+SA,데이터 파이프라인 ODS/DW/Mart,ODS와 DW 차이는?,ODS는 원천 정합·표준화에 가깝고 DW는 전사 차원·팩트 모델에 가깝다.
+SA,데이터 파이프라인 ODS/DW/Mart,품질 이슈는?,격리 테이블·DQ 로그·재처리 정책으로 막는다.
